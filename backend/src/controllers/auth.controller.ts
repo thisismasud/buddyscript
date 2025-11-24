@@ -54,6 +54,7 @@ export const UserController = {
     if (!isPasswordValid) throw new AppError(400, "Invalid email or password");
 
     const userObject = {
+      userId: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,

@@ -10,6 +10,7 @@ import rateLimit from "express-rate-limit";
 import connectDB from "./config/db";
 import errorHandler from "./middlewares/common/errorHandler";
 import userRoutes from "./routes/auth.routes"
+import postRoutes from "./routes/post.routes"
 
 // Initialize App
 const app = express();
@@ -36,6 +37,7 @@ app.use(limiter);
 
 // API Routes
 app.use("/api/auth", userRoutes);
+app.use("/api/post", postRoutes)
 
 // Error Handler
 app.use(errorHandler);
