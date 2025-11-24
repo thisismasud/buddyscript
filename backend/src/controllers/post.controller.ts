@@ -7,15 +7,24 @@ import path from "path";
 
 export const PostController = {
     createPost: asyncHandler(async(req:Request, res:Response) =>{
-        const {text, isPrivate, postImages} = req.body 
+        const {text, isPrivate} = req.body 
+        const files = req.files as Express.Multer.File[] | undefined
         const userId = (req as any).user.userId
-        if(!text && !(postImages?.length > 0)){
-            throw new AppError(400, "Text or Images required to post")
+        let images: string[] =[]
+
+        if(files && files.length > 0){
+            images = files.map(file => file.filename)
         }
-        console.log(postImages)
-
-
-        console.log(req.files)
+        const post = await PostModel.create({
+            author:userId,
+            text: text || "",
+            isPrivate: isPrivate === 'true',
+        })
+        return res.status(201).json({
+            success: true,
+            message: 'Post uploaded',
+            data: post
+        })
     
     })
 }

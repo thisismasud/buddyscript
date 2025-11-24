@@ -3,7 +3,7 @@ const PostSchema = new Schema(
   {
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     text: { type: String, default: '', trim: true },
-    imageUrl: { type: String, default: null },
+    images: [{type: String, default: [] }],
     isPrivate: { type: Boolean, default: false, index: true },
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
