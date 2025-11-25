@@ -1,6 +1,27 @@
 import { Request, Response } from "express";
+import { Types } from "mongoose";
 import PostModel from "../models/Post.model";
 import { AppError, asyncHandler } from "../utils/asyncHandler";
+
+//types
+interface IUserPopulated {
+  _id: Types.ObjectId;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+}
+
+interface IPost {
+  _id: Types.ObjectId;
+  author: IUserPopulated;
+  text: string;
+  images: string[];
+  isPrivate: boolean;
+  likesCount: number;
+  commentsCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export const PostController = {
   createPost: asyncHandler(async (req: Request, res: Response) => {
@@ -23,9 +44,10 @@ export const PostController = {
       data: post,
     });
   }),
+
   getPosts: asyncHandler(async (req: Request, res: Response) => {
     const limitParam = req.query.limit;
-    const cursorParam = req.query.cursorParam;
+    const cursorParam = req.query.cursor;
 
     let limit = 10;
     if (limitParam) {
@@ -49,7 +71,10 @@ export const PostController = {
     const posts = await PostModel.find(query)
       .sort({ createdAt: -1 })
       .limit(limit + 1)
-      .populate("author", "firstName lastName avatarUrl")
+      .populate<{ author: IUserPopulated }>(
+        "author",
+        "firstName lastName avatarUrl"
+      )
       .lean();
 
     //check if there is more post
@@ -69,7 +94,7 @@ export const PostController = {
 
     //build image urls
     const postsWithImages = posts.map((post) => {
-      const imageUrls = posts.images.map((fileName) => {
+      const imageUrls = post.images.map((fileName: string) => {
         return `/public/uploads/posts/${fileName}`;
       });
       return {
